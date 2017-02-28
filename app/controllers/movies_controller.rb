@@ -13,6 +13,38 @@ class MoviesController < ApplicationController
   def index
 
 @all_ratings = Movie.distinct.pluck(:rating)
+
+
+redirect = false
+logger.debug(session.inspect)
+
+if params[:sort]
+  @column_to_sort = params[:sort]
+  session[:sort] = params[:sort]
+  elsif session[:sort]
+  @column_to_sort = session[:sort]
+  redirect = true
+else
+  @column_to_sort = nil
+end
+
+if params[:commit] == 'Refresh' and params[:ratings] == nil
+  @set_ratings = nil
+  session[:ratings] = nil
+  elsif params[:ratings]
+  @set_ratings = params[:ratings]
+  session[:ratings] = params[:ratings]
+  elsif session[:ratings]
+  @set_ratings = session[:ratings]
+  redirect = true
+else
+  @set_ratings = nil
+end
+
+if redirect
+  flash.keep
+  redirect_to movies_path :sort => @column_to_sort, :ratings => @set_ratings
+end
 @column_to_sort = params[:sort]
 @set_ratings = params[:ratings]
 
