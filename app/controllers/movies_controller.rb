@@ -11,18 +11,25 @@ class MoviesController < ApplicationController
   end
 
   def index
-   
-    @column_to_sort = params[:sort]
-    @all_ratings = Movie.distinct.pluck(:rating)
-    @set_ratings = params[:ratings]
-    if @set_ratings == nil
-      @set_ratings = Hash.new
-    end
-    if @set_ratings
-      @get_rate = @set_ratings.keys
-      @movies = Movie.where(:rating => @get_rate).order(@column_to_sort)
-    end
-    
+
+@all_ratings = Movie.distinct.pluck(:rating)
+@column_to_sort = params[:sort]
+@set_ratings = params[:ratings]
+
+if @set_ratings and @column_to_sort
+  @get_keys = params[:ratings].keys
+  @movies = Movie.where(:rating => @get_keys).order(params[:sort])
+  elsif @set_ratings
+  @get_keys = params[:ratings].keys
+  @movies = Movie.where(:rating => @get_keys)
+  elsif @column_to_sort
+  @movies = Movie.order(@column_to_sort)
+else
+  @movies = Movie.all
+end
+if @set_ratings == nil
+  @set_ratings = Hash.new
+end
   end
 
   def new
